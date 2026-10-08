@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Club de Literatura Doki Doki | Página Interactiva</title>
+    <meta name="description" content="Una experiencia interactiva inspirada en Doki Doki Literature Club. Únete al club, escribe poemas, conoce a las chicas y descubre poesía del día.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Floating particles background -->
+    <div class="particles" id="particles"></div>
+
+    <!-- Header / Navbar -->
+    <header class="header">
+        <div class="logo">
+            <span class="logo-icon">🌸</span>
+            <span class="logo-text">Club de Literatura</span>
+        </div>
+        <nav class="nav" id="nav">
+            <a href="#inicio" class="nav-link active">Inicio</a>
+            <a href="#miembros" class="nav-link">Miembros</a>
+            <a href="#poema" class="nav-link">Poema del Día</a>
+            <a href="#escribir" class="nav-link">Escribe</a>
+            <a href="#unirse" class="nav-link">Únete</a>
+        </nav>
+        <button class="menu-toggle" id="menuToggle" aria-label="Menú">
+            <span></span><span></span><span></span>
+        </button>
+    </header>
+
+    <!-- Hero Section -->
+    <section id="inicio" class="hero">
+        <div class="hero-content">
+            <h1 class="hero-title">
+                <span class="title-line">Bienvenido al</span>
+                <span class="title-main">Club de Literatura</span>
+                <span class="title-sub">Doki Doki</span>
+            </h1>
+            <p class="hero-desc">Un espacio cálido donde las palabras cobran vida, las amistades florecen y cada poema cuenta una historia.</p>
+            
+            <div class="name-form" id="nameForm">
+                <label for="userName">¿Cómo te llamas, futuro miembro?</label>
+                <div class="input-group">
+                    <input type="text" id="userName" placeholder="Escribe tu nombre..." maxlength="30" autocomplete="off">
+                    <button id="saveNameBtn" class="btn btn-primary">¡Entrar al Club!</button>
+                </div>
+                <p class="name-hint">Presiona Enter o haz clic para guardar (se recordará en tu dispositivo)</p>
+            </div>
+            
+            <div class="welcome-msg hidden" id="welcomeMsg">
+                <p>¡Hola, <strong id="displayName"></strong>! 💖 Estamos felices de tenerte aquí.</p>
+                <button id="changeNameBtn" class="btn btn-secondary">Cambiar nombre</button>
+            </div>
+        </div>
+        <div class="hero-decoration">
+            <div class="book-stack">
+                <div class="book book1"></div>
+                <div class="book book2"></div>
+                <div class="book book3"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Members Section -->
+    <section id="miembros" class="members">
+        <h2 class="section-title">Las Chicas del Club</h2>
+        <p class="section-subtitle">Haz clic en una de ellas para charlar. Usa las flechas ← → del teclado para navegar.</p>
+        
+        <div class="members-grid" id="membersGrid" tabindex="0">
+            <!-- Cards injected by JS -->
+        </div>
+    </section>
+
+    <!-- Dialogue Modal -->
+    <div class="modal hidden" id="dialogueModal">
+        <div class="modal-content dialogue-box">
+            <button class="modal-close" id="closeDialogue">&times;</button>
+            <div class="dialogue-header">
+                <div class="char-avatar" id="dialogueAvatar"></div>
+                <h3 id="dialogueName"></h3>
+            </div>
+            <div class="dialogue-text" id="dialogueText"></div>
+            <div class="dialogue-choices" id="dialogueChoices"></div>
+        </div>
+    </div>
+
+    <!-- Poem of the Day (API) -->
+    <section id="poema" class="poem-day">
+        <h2 class="section-title">Poema del Día</h2>
+        <p class="section-subtitle">Inspiración literaria traída especialmente para ti desde PoetryDB</p>
+        
+        <div class="poem-card" id="poemCard">
+            <div class="poem-loading" id="poemLoading">
+                <div class="spinner"></div>
+                <p>Buscando un poema especial...</p>
+            </div>
+            <div class="poem-content hidden" id="poemContent">
+                <h3 class="poem-title" id="poemTitle"></h3>
+                <p class="poem-author" id="poemAuthor"></p>
+                <div class="poem-lines" id="poemLines"></div>
+                <button id="newPoemBtn" class="btn btn-primary">Otro poema ✨</button>
+            </div>
+            <div class="poem-error hidden" id="poemError">
+                <p>No se pudo cargar el poema. Intenta de nuevo.</p>
+                <button id="retryPoemBtn" class="btn btn-secondary">Reintentar</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Write Poem Section - Drag & Drop + Keyboard -->
+    <section id="escribir" class="write-poem">
+        <h2 class="section-title">Escribe tu Poema</h2>
+        <p class="section-subtitle">Arrastra las palabras al área de escritura o haz clic para agregarlas. ¡Crea algo único!</p>
+        
+        <div class="writer-container">
+            <div class="word-bank" id="wordBank">
+                <!-- Words injected -->
+            </div>
+            
+            <div class="poem-canvas" id="poemCanvas" tabindex="0">
+                <p class="canvas-placeholder" id="canvasPlaceholder">Suelta las palabras aquí o haz clic en ellas...</p>
+                <div class="poem-lines-area" id="poemLinesArea"></div>
+            </div>
+            
+            <div class="writer-actions">
+                <button id="clearPoemBtn" class="btn btn-secondary">Limpiar</button>
+                <button id="savePoemBtn" class="btn btn-primary">Guardar Poema</button>
+                <button id="loadPoemBtn" class="btn btn-secondary">Cargar Guardado</button>
+            </div>
+            
+            <div class="saved-status" id="savedStatus"></div>
+        </div>
+    </section>
+
+    <!-- Join Club Form -->
+    <section id="unirse" class="join-club">
+        <h2 class="section-title">Únete al Club</h2>
+        <p class="section-subtitle">Completa el formulario. Validamos todo en tiempo real ✨</p>
+        
+        <form class="join-form" id="joinForm" novalidate>
+            <div class="form-group">
+                <label for="fullName">Nombre completo</label>
+                <input type="text" id="fullName" name="fullName" required minlength="3" maxlength="50" placeholder="Tu nombre real">
+                <span class="error-msg" id="fullNameError"></span>
+            </div>
+            
+            <div class="form-group">
+                <label for="email">Correo electrónico</label>
+                <input type="email" id="email" name="email" required placeholder="tu@email.com">
+                <span class="error-msg" id="emailError"></span>
+            </div>
+            
+            <div class="form-group">
+                <label for="favorite">Miembro favorito</label>
+                <select id="favorite" name="favorite" required>
+                    <option value="">Selecciona...</option>
+                    <option value="sayori">Sayori</option>
+                    <option value="yuri">Yuri</option>
+                    <option value="natsuki">Natsuki</option>
+                    <option value="monika">Monika</option>
+                </select>
+                <span class="error-msg" id="favoriteError"></span>
+            </div>
+            
+            <div class="form-group">
+                <label for="reason">¿Por qué quieres unirte? (mín. 20 caracteres)</label>
+                <textarea id="reason" name="reason" rows="4" required minlength="20" maxlength="300" placeholder="Cuéntanos tu pasión por la literatura..."></textarea>
+                <span class="char-count" id="charCount">0 / 300</span>
+                <span class="error-msg" id="reasonError"></span>
+            </div>
+            
+            <div class="form-group checkbox-group">
+                <label class="checkbox-label">
+                    <input type="checkbox" id="terms" name="terms" required>
+                    <span>Acepto las reglas del club y prometo escribir al menos un poema 📝</span>
+                </label>
+                <span class="error-msg" id="termsError"></span>
+            </div>
+            
+            <button type="submit" class="btn btn-primary btn-large" id="submitBtn">Enviar Solicitud</button>
+        </form>
+        
+        <div class="success-msg hidden" id="successMsg">
+            <div class="success-icon">🎉</div>
+            <h3>¡Solicitud enviada!</h3>
+            <p id="successText"></p>
+            <button id="resetFormBtn" class="btn btn-secondary">Enviar otra</button>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>Hecho con 💖 inspirado en <strong>Doki Doki Literature Club</strong></p>
+        <p class="footer-note">Proyecto interactivo educativo • API: PoetryDB • Persistencia: localStorage</p>
+        <p class="keyboard-hint">Atajos: <kbd>←</kbd> <kbd>→</kbd> navegar miembros • <kbd>Esc</kbd> cerrar diálogo • <kbd>P</kbd> ir a poemas</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
